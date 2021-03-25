@@ -20,11 +20,12 @@ class Mathematician:
     student_ids: List[int] = field(default_factory=list)
     math_genealogy_url: Optional[str] = None
     math_sci_net_url: Optional[str] = None
+    publications: Optional[int] = None
+    citations: Optional[int] = None
 
 
 class MathGenealogySpider(scrapy.Spider):
     name = "math_genealogy"
-    download_delay = 0.25
 
     # start_urls = [
     #     f'https://www.mathgenealogy.org/id.php?id={i}'
@@ -36,8 +37,6 @@ class MathGenealogySpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        print('accessed page %s', response.url)
-
         # instantiate data class
         mathematician = Mathematician()
 
@@ -102,17 +101,49 @@ class MathGenealogySpider(scrapy.Spider):
         mathematician.subject = response.css('div[style="text-align: center; margin-top: 1ex"]::text').get()
 
         # get link to MathSciNet if it exists
-        math_sci_net_a_tag = response.css('a[href^="http://www.ams.org/mathscinet/MRAuthorID"]').get()
+        math_sci_net_link = response.css('a[href^="http://www.ams.org/mathscinet/MRAuthorID"]')
+        math_sci_net_a_tag = math_sci_net_link.get()
         if math_sci_net_a_tag:
             math_sci_net_url_match = re.search('href="(.+)"', math_sci_net_a_tag)
             if math_sci_net_url_match:
                 mathematician.math_sci_net_url = math_sci_net_url_match.group(1)
 
-        # write to a file
-        with open(f'data/math_genealogy/mathematician-{mathematician.id_}', 'w') as f:
-            f.write(json.dumps(asdict(mathematician), indent=2, default=str))
+        # follow math sci net url and try to scrape publications and citations
+        if mathematician.math_sci_net_url:
+            # follow valid url, passing data collected up to this point along to the next parse method
+            request = scrapy.Request(mathematician.math_sci_net_url, callback=self.parse_math_sci_net)
+            request.meta['mathematician'] = mathematician  # passes collected data to next parse method
+            yield request
+        else:
+            self.logger.debug('mathematician: %s', asdict(mathematician))
+            yield mathematician
 
         # follow urls for advisor and students
+        self.logger.debug('following urls: %s', ', '.join(urls))
+        yield from response.follow_all(urls, callback=self.parse)
+
+    def parse_math_sci_net(self, response):
+        mathematician = response.meta['mathematician']
+        trs = response.css('tr')
+        self.logger.debug('trs: %s', trs)
+        if trs:
+            publication_trs = [tr for tr in trs if "total publications" in tr.get().lower()]
+            self.logger.debug('publication_trs: %s', publication_trs)
+            if publication_trs:
+                publications = publication_trs[0].css('td:last-of-type::text').get()
+                self.logger.debug('publications: %s', publications)
+                mathematician.publications = int(publications) if publications else publications
+            citation_trs = [tr for tr in trs if "total citations" in tr.get().lower()]
+            self.logger.debug('citation_trs: %s', citation_trs)
+            if citation_trs:
+                citations = citation_trs[0].css('td:last-of-type::text').get()
+                self.logger.debug('citations: %s', citations)
+                mathematician.citations = int(citations) if citations else citations
+
+        self.logger.debug('mathematician: %s', asdict(mathematician))
+
+        yield mathematician
+
 
     def parse_a_selector(self, selector) -> Tuple[Optional[int], Optional[str]]:
         id_, url = None, None
