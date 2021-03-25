@@ -16,7 +16,7 @@ class Mathematician:
     thesis: Optional[str] = None
     nationality: Optional[str] = None
     subject: Optional[str] = None
-    advisor_id: Optional[int] = None
+    advisor_ids: List[int] = field(default_factory=list)
     student_ids: List[int] = field(default_factory=list)
     math_genealogy_url: Optional[str] = None
     math_sci_net_url: Optional[str] = None
@@ -26,9 +26,13 @@ class MathGenealogySpider(scrapy.Spider):
     name = "math_genealogy"
     download_delay = 0.25
 
+    # start_urls = [
+    #     f'https://www.mathgenealogy.org/id.php?id={i}'
+    #     for i in random.sample(range(1, 265263 + 1), k=1000)
+    # ]
+
     start_urls = [
-        f'https://www.mathgenealogy.org/id.php?id={i}'
-        for i in random.sample(range(1, 265263 + 1), k=1000)
+        'https://www.mathgenealogy.org/id.php?id=62'
     ]
 
     def parse(self, response):
@@ -72,13 +76,22 @@ class MathGenealogySpider(scrapy.Spider):
         # links to follow
         urls = []
 
+        # get links and ids for other mathematicians on the page
         mathematician_a_selectors = response.css('a[href^="id.php?id="]')
-        advisor_selector = mathematician_a_selectors[0] if mathematician_a_selectors else None
-        student_selectors = mathematician_a_selectors[1:] if len(mathematician_a_selectors) > 1 else []
+        # remove link to students in chronological order
+        mathematician_a_selectors = [s for s in mathematician_a_selectors if "Chrono=" not in s.get()]
+        # student links are inside a table, but advisor links are outside the table
+        student_selectors = response.css('table a[href^="id.php?id="]')
+        student_text = set(map(lambda x: x.get(), student_selectors))
 
-        advisor_id, advisor_url = self.parse_a_selector(advisor_selector)
-        mathematician.advisor_id = advisor_id
-        urls.append(advisor_url)
+        advisor_selectors = [
+            s for s in mathematician_a_selectors
+            if s.get() not in student_text]
+
+        for advisor_selector in advisor_selectors:
+            advisor_id, advisor_url = self.parse_a_selector(advisor_selector)
+            mathematician.advisor_ids.append(advisor_id)
+            urls.append(advisor_url)
 
         for student_selector in student_selectors:
             student_id, student_url = self.parse_a_selector(student_selector)
@@ -118,5 +131,3 @@ class MathGenealogySpider(scrapy.Spider):
             url = href_match.group(1)
 
         return id_, url
-
-
