@@ -47,7 +47,7 @@ class SampleJsonWriterPipeline:
 
 class SqlalchemyWriterPipeline:
 
-    batch_size = 5
+    batch_size = 250
 
     def open_spider(self, spider):
         self.processed_ids = set()
@@ -90,6 +90,7 @@ class SqlalchemyWriterPipeline:
                         id=item['id_'],
                     )
                 mathematician.id = item['id_']
+                mathematician.name = item.get('name')
                 mathematician.school = item.get('school')
                 mathematician.graduated = item.get('graduated')
                 mathematician.thesis = item.get('thesis')
