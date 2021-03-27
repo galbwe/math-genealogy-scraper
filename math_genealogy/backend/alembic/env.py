@@ -6,24 +6,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-
-ENVIRONMENT = "ENVIRONMENT"
-
-
-POSTGRES_CONNECTION_DEV = "POSTGRES_CONNECTION_DEV"
-
-
-POSTGRES_CONNECTION_PROD = "POSTGRES_CONNECTION_PROD"
-
-
-def get_url(environment):
-    if environment.lower().startswith("dev"):
-        key = POSTGRES_CONNECTION_DEV
-    elif environment.lower().startswith("prod"):
-        key = POSTGRES_CONNECTION_PROD
-    else:
-        raise ValueError(f"Invalid environment key {environment}")
-    return os.environ[key]
+from math_genealogy.config import CONFIG as math_genealogy_config
 
 
 # this is the Alembic Config object, which provides
@@ -35,7 +18,7 @@ config = context.config
 config.set_section_option(
     config.config_ini_section,
     "DB_CONNECTION",
-    get_url(os.environ[ENVIRONMENT]),
+    math_genealogy_config.db_connection,
 )
 
 
@@ -69,9 +52,8 @@ def run_migrations_offline():
     script output.
 
     """
-    url = get_url(os.environ[ENVIRONMENT])
     context.configure(
-        url=url,
+        url=math_genealogy_config.db_connection,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
