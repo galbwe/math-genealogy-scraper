@@ -1,6 +1,5 @@
 import random
 import re
-import json
 from typing import Optional, List, Tuple
 from dataclasses import dataclass, field, asdict
 
@@ -27,13 +26,9 @@ class Mathematician:
 class MathGenealogySpider(scrapy.Spider):
     name = "math_genealogy"
 
-    # start_urls = [
-    #     f'https://www.mathgenealogy.org/id.php?id={i}'
-    #     for i in random.sample(range(1, 265263 + 1), k=1000)
-    # ]
-
     start_urls = [
-        'https://www.mathgenealogy.org/id.php?id=62'
+        f'https://www.mathgenealogy.org/id.php?id={i}'
+        for i in random.sample(range(1, 265263 + 1), k=16)
     ]
 
     def parse(self, response):

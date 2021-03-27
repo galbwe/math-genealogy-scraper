@@ -1,0 +1,1 @@
+psql "$PSQL_PROD_CONNECTION"
