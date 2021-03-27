@@ -27,6 +27,6 @@ class StudentAdvisor(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     student_id = Column(Integer, ForeignKey('mathematician.id'))
-    student = relationship("Mathematician", backref="advisors")
+    student = relationship("Mathematician", foreign_keys=[student_id])
     advisor_id = Column(Integer, ForeignKey('mathematician.id'))
-    advisor = relationship("Mathematician", backref="students")
+    advisor = relationship("Mathematician", foreign_keys=[advisor_id])
