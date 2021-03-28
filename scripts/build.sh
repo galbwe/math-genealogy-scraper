@@ -1,1 +1,1 @@
-docker build -t $1 $REPO_URL
+docker build -t math_genealogy $REPO_URL

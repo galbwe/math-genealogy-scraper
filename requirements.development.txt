@@ -1,5 +1,6 @@
 alembic==1.5.8
 appnope==0.1.2
+asn1crypto==1.4.0
 attrs==20.3.0
 Automat==20.2.0
 backcall==0.2.0
@@ -22,10 +23,11 @@ jmespath==0.10.0
 lxml==4.6.3
 Mako==1.1.4
 MarkupSafe==1.1.1
--e git+git@github.com:galbwe/math-genealogy-scraper.git@d6a1fd1625a34f0989ef5a59065cf14e7201697e#egg=math_genealogy
+-e git+git@github.com:galbwe/math-genealogy-scraper.git@a70009780cac788851ac460b2bb1a38dd48ec41f#egg=math_genealogy
 parsel==1.6.0
 parso==0.8.1
 pexpect==4.8.0
+pg8000==1.19.0
 pickleshare==0.7.5
 prompt-toolkit==3.0.18
 Protego==0.1.16
@@ -39,6 +41,7 @@ pyOpenSSL==20.0.1
 python-dateutil==2.8.1
 python-editor==1.0.4
 queuelib==1.5.0
+scramp==1.3.0
 Scrapy==2.4.1
 service-identity==18.1.0
 six==1.15.0
