@@ -48,6 +48,7 @@ class SampleJsonWriterPipeline:
 class SqlalchemyWriterPipeline:
 
     batch_size = 250
+    cache_size = 2000
 
     def open_spider(self, spider):
         self.processed_ids = set()
@@ -60,6 +61,7 @@ class SqlalchemyWriterPipeline:
         pass
 
     def process_item(self, item, spider):
+        self._update_cache()
         if not item.id_:
             raise DropItem(f'Item had invalid key')
         if item.id_ in self.processed_ids:
@@ -144,3 +146,7 @@ class SqlalchemyWriterPipeline:
             logger.error("Could not write items to database: %r", ','.join(str(item['id_']) for item in self.items))
         finally:
             session.close()
+
+    def _update_cache(self):
+        if len(self.processed_ids) > self.cache_size:
+            self.processed_ids = set()
