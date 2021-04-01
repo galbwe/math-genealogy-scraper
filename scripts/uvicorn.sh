@@ -1,0 +1,1 @@
+uvicorn math_genealogy.backend.app:app --reload

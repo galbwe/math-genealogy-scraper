@@ -30,7 +30,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from math_genealogy.backend.models import Base
+from math_genealogy.backend.db import SQLAlchemyBase as Base
 target_metadata = Base.metadata
 
 

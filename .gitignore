@@ -144,3 +144,7 @@ cython_debug/
 
 # Editor specific
 .vscode/
+
+
+# FastAPI
+*/.DS_Store

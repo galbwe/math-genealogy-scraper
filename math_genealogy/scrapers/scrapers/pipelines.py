@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
 from math_genealogy.config import CONFIG
-from math_genealogy.backend.models import Mathematician, StudentAdvisor
+from math_genealogy.backend.db import SQLAlchemyMathematician as Mathematician, SQLAlchemyStudentAdvisor as StudentAdvisor
 
 
 logger = logging.getLogger(__name__)
