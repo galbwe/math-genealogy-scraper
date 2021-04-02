@@ -1,9 +1,17 @@
-from typing import Callable, List, Union
+import logging
+import reprlib
+from typing import Callable, List, Union, Iterable, Optional
+import sqlalchemy
 
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+
+from .models import PydanticMathematician
+
+
+logger = logging.getLogger(__name__)
 
 
 from ..config import CONFIG
@@ -29,7 +37,7 @@ QueryResult = Union[BaseModel, List[BaseModel]]
 # ------------------------------------------------------------------------
 
 
-class SQLAlchemyMathematician(BaseModel):
+class Mathematician(BaseModel):
     __tablename__ = 'mathematician'
 
     id = Column(Integer, primary_key=True)
@@ -44,8 +52,32 @@ class SQLAlchemyMathematician(BaseModel):
     publications = Column(Integer)
     citations = Column(Integer)
 
+    @property
+    def as_dict(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            school=self.school,
+            graduated=self.graduated,
+            thesis=self.thesis,
+            country=self.country,
+            subject=self.subject,
+            math_genealogy_url=self.math_genealogy_url,
+            math_sci_net_url=self.math_sci_net_url,
+            publications=self.publications,
+            citations=self.citations,
+        )
 
-class SQLAlchemyStudentAdvisor(BaseModel):
+    @property
+    def as_pydantic(self) -> PydanticMathematician:
+        return PydanticMathematician(**self.as_dict)
+
+    @classmethod
+    def from_pydantic(cls, pydantic_model) -> "Mathematician":
+        return cls(**pydantic_model.dict())
+
+
+class StudentAdvisor(BaseModel):
     __tablename__ = 'student_advisor'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -68,13 +100,21 @@ engine = create_engine(CONFIG.db_connection)
 Session = sessionmaker(bind=engine)
 
 
-def query(q: Callable[..., QueryResult]):
+def get_mathematician_by_id(session: Session, id_: int) -> Optional[PydanticMathematician]:
+    try:
+        q = session.query(Mathematician).filter(Mathematician.id == id_)
+        return q.one_or_none()
+    except Exception as e:
+        session.rollback()
+        raise e
 
-    def _decorated(session: Session, *args, **kwargs):
-        try:
-            q(session, *args, **kwargs)
-            session.commit()
-        except Exception as e:
-            session.rollback()
 
-    return _decorated
+def insert_mathematician(session: Session, mathematician: PydanticMathematician) -> PydanticMathematician:
+    sqlalchemy_mathematician = Mathematician.from_pydantic(mathematician)
+    try:
+        session.add(sqlalchemy_mathematician)
+    except Exception as e:
+        session.rollback()
+        raise e
+    session.commit()
+    return mathematician
