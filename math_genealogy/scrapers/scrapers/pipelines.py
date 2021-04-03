@@ -57,9 +57,6 @@ class SqlalchemyWriterPipeline:
         self.engine = create_engine(CONFIG.db_connection)
         self.Session = sessionmaker(bind=self.engine)
 
-    def close_spider(self, spider):
-        pass
-
     def process_item(self, item, spider):
         self._update_cache()
         if not item.id_:
