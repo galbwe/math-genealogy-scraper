@@ -1,9 +1,8 @@
 import logging
 from typing import Dict, List
 
-from fastapi import FastAPI, HTTPException
-
 import math_genealogy.backend.db as db
+from fastapi import FastAPI, HTTPException
 
 from .models import PydanticMathematician as Mathematician
 

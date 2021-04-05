@@ -3,6 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from math_genealogy.backend.db import BaseModel as Base
 from math_genealogy.config import CONFIG as math_genealogy_config
 
 # this is the Alembic Config object, which provides
@@ -26,7 +27,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from math_genealogy.backend.db import BaseModel as Base  # noqa E402
+
 
 target_metadata = Base.metadata
 
