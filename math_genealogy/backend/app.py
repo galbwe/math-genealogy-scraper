@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+# TODO: blanket error handling
 
 
 @app.get("/mathematicians/{mathematician_id}")
@@ -56,13 +54,14 @@ def get_mathematician_field_names() -> List[str]:
     return list(db.MATHEMATICIAN_FIELDS)
 
 
-# TODO: sorting
 # TODO: search
 @app.get("/mathematicians")
-def query_mathematicians(page: int = 1, perpage: int = 100, fields: str = "*") -> List[Dict]:
+def query_mathematicians(page: int = 1, perpage: int = 100, fields: str = "*", order_by: str = "id", descending: str = "false") -> List[Dict]:
     if fields != "*":
         fields = [field.strip() for field in fields.split(",")]
-    return db.get_mathematicians(page, perpage, fields)
+    order_by = [field.strip() for field in order_by.split(",")]
+    descending = descending.strip().lower() == "true"
+    return db.get_mathematicians(page, perpage, fields, order_by, descending)
 
 
 # relationships

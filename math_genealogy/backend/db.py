@@ -240,11 +240,28 @@ def get_advisors(id_: int) -> List[Mathematician]:
     return [advisor.as_pydantic for advisor in advisors]
 
 
-def get_mathematicians(page: int, perpage: int, fields: List[str]) -> List[Dict]:
+def get_mathematicians(
+    page: int,
+    perpage: int,
+    fields: List[str],
+    order_by: List[str],
+    descending: bool
+) -> List[Dict]:
     session = Session()
     # TODO: validate inputs
+
     columns = (MATHEMATICIAN_FIELDS.get(field) for field in fields)
+    order_by = (MATHEMATICIAN_FIELDS.get(field) for field in order_by)
+    if descending:
+        order_by = (
+            column.desc()
+            for column in order_by
+            if order_by is not None
+        )
+
     query = session.query(*[column for column in columns if column is not None])
+    query = query.order_by(*[column for column in order_by if column is not None])
+
     start_idx = (page - 1) * perpage
     end_idx = start_idx + perpage
     records = query[start_idx:end_idx]
