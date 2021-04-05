@@ -77,7 +77,9 @@ class SqlalchemyWriterPipeline:
         try:
             for item in self.items:
                 mathematician = (
-                    session.query(Mathematician).filter(Mathematician.id == item["id_"]).first()
+                    session.query(Mathematician)
+                    .filter(Mathematician.id == item["id_"])
+                    .first()
                 )
                 if not mathematician:
                     mathematician = Mathematician(
@@ -99,7 +101,9 @@ class SqlalchemyWriterPipeline:
 
                 for student_id in item.get("student_ids", []):
                     student = (
-                        session.query(Mathematician).filter(Mathematician.id == student_id).first()
+                        session.query(Mathematician)
+                        .filter(Mathematician.id == student_id)
+                        .first()
                     )
                     if not student:
                         student = Mathematician(
@@ -125,7 +129,9 @@ class SqlalchemyWriterPipeline:
 
                 for advisor_id in item.get("advisor_ids", []):
                     advisor = (
-                        session.query(Mathematician).filter(Mathematician.id == advisor_id).first()
+                        session.query(Mathematician)
+                        .filter(Mathematician.id == advisor_id)
+                        .first()
                     )
                     if not advisor:
                         advisor = Mathematician(

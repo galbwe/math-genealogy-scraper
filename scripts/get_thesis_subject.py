@@ -61,6 +61,6 @@ def main(folder):
 if __name__ == '__main__':
     try:
         folder = sys.argv[1]
-    except IndexError as e:
+    except IndexError as e:  # noqa F841
         folder = "thesis_subjects"
     main(folder)

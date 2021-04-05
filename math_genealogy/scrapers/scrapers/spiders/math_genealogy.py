@@ -80,7 +80,9 @@ class MathGenealogySpider(scrapy.Spider):
         student_selectors = response.css('table a[href^="id.php?id="]')
         student_text = set(map(lambda x: x.get(), student_selectors))
 
-        advisor_selectors = [s for s in mathematician_a_selectors if s.get() not in student_text]
+        advisor_selectors = [
+            s for s in mathematician_a_selectors if s.get() not in student_text
+        ]
 
         for advisor_selector in advisor_selectors:
             advisor_id, advisor_url = self.parse_a_selector(advisor_selector)
@@ -98,7 +100,9 @@ class MathGenealogySpider(scrapy.Spider):
         ).get()
 
         # get link to MathSciNet if it exists
-        math_sci_net_link = response.css('a[href^="http://www.ams.org/mathscinet/MRAuthorID"]')
+        math_sci_net_link = response.css(
+            'a[href^="http://www.ams.org/mathscinet/MRAuthorID"]'
+        )
         math_sci_net_a_tag = math_sci_net_link.get()
         if math_sci_net_a_tag:
             math_sci_net_url_match = re.search('href="(.+)"', math_sci_net_a_tag)
@@ -128,12 +132,16 @@ class MathGenealogySpider(scrapy.Spider):
         trs = response.css("tr")
         self.logger.debug("trs: %s", trs)
         if trs:
-            publication_trs = [tr for tr in trs if "total publications" in tr.get().lower()]
+            publication_trs = [
+                tr for tr in trs if "total publications" in tr.get().lower()
+            ]
             self.logger.debug("publication_trs: %s", publication_trs)
             if publication_trs:
                 publications = publication_trs[0].css("td:last-of-type::text").get()
                 self.logger.debug("publications: %s", publications)
-                mathematician.publications = int(publications) if publications else publications
+                mathematician.publications = (
+                    int(publications) if publications else publications
+                )
             citation_trs = [tr for tr in trs if "total citations" in tr.get().lower()]
             self.logger.debug("citation_trs: %s", citation_trs)
             if citation_trs:

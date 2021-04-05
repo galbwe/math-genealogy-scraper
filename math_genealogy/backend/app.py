@@ -1,11 +1,11 @@
 import logging
-from typing import List, Dict
+from typing import Dict, List
 
 from fastapi import FastAPI, HTTPException
 
 import math_genealogy.backend.db as db
-from .models import PydanticMathematician as Mathematician
 
+from .models import PydanticMathematician as Mathematician
 
 # TODO: set up logging config
 logger = logging.getLogger(__name__)
@@ -37,7 +37,9 @@ def insert_mathematician(mathematician: Mathematician) -> Mathematician:
 
 
 @app.put("/mathematicians/{mathematician_id}")
-def update_mathematician(mathematician_id: int, mathematician: Mathematician) -> Mathematician:
+def update_mathematician(
+    mathematician_id: int, mathematician: Mathematician
+) -> Mathematician:
     updated = db.update_mathematician(mathematician_id, mathematician)
     if updated is None:
         raise HTTPException(status_code=404, detail="Item not found")

@@ -1,6 +1,7 @@
 from typing import Optional
 
-from pydantic import BaseModel as PydanticBase, HttpUrl
+from pydantic import BaseModel as PydanticBase
+from pydantic import HttpUrl
 
 
 class PydanticMathematician(PydanticBase):

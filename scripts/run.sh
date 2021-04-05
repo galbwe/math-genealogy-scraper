@@ -1,1 +1,2 @@
-docker run --rm --name math_genealogy_scraper --env-file $1 math_genealogy
+#!/bin/bash
+docker run --rm --name math_genealogy_api --env-file docker.env math_genealogy

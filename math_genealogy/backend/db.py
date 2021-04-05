@@ -1,14 +1,13 @@
 import logging
 import re
-from typing import List, Union, Dict, Optional
+from typing import Dict, List, Optional, Union
 
+from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import or_, Column, Integer, String, ForeignKey, create_engine
 
 from ..config import CONFIG
 from .models import PydanticMathematician
-
 
 logger = logging.getLogger(__name__)
 
@@ -176,7 +175,9 @@ def update_mathematician(
     mathematician.id = id_
     session = Session()
     update_data = Mathematician.from_pydantic(mathematician).as_dict
-    db_mathematician = session.query(Mathematician).filter(Mathematician.id == id_).one_or_none()
+    db_mathematician = (
+        session.query(Mathematician).filter(Mathematician.id == id_).one_or_none()
+    )
     if not db_mathematician:
         return None
     try:
@@ -191,7 +192,9 @@ def update_mathematician(
 
 def delete_mathematician(id_: int) -> Optional[Mathematician]:
     session = Session()
-    db_mathematician = session.query(Mathematician).filter(Mathematician.id == id_).one_or_none()
+    db_mathematician = (
+        session.query(Mathematician).filter(Mathematician.id == id_).one_or_none()
+    )
     if not db_mathematician:
         return None
     deleted = db_mathematician.as_pydantic
@@ -222,14 +225,18 @@ def delete_mathematician(id_: int) -> Optional[Mathematician]:
 
 def get_students(id_: int) -> List[Mathematician]:
     session = Session()
-    student_ids = session.query(StudentAdvisor.student_id).filter(StudentAdvisor.advisor_id == id_)
+    student_ids = session.query(StudentAdvisor.student_id).filter(
+        StudentAdvisor.advisor_id == id_
+    )
     students = session.query(Mathematician).filter(Mathematician.id.in_(student_ids))
     return [student.as_pydantic for student in students]
 
 
 def get_advisors(id_: int) -> List[Mathematician]:
     session = Session()
-    advisor_ids = session.query(StudentAdvisor.advisor_id).filter(StudentAdvisor.student_id == id_)
+    advisor_ids = session.query(StudentAdvisor.advisor_id).filter(
+        StudentAdvisor.student_id == id_
+    )
     advisors = session.query(Mathematician).filter(Mathematician.id.in_(advisor_ids))
     return [advisor.as_pydantic for advisor in advisors]
 
