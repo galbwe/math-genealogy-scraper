@@ -1,4 +1,5 @@
 venv
+venv_prod
 *.egg-info
 __pycache__
 *.pyc
