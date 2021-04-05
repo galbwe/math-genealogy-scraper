@@ -19,18 +19,13 @@ async def root():
     return {"message": "Hello World"}
 
 
-# TODO: pagination
-# TODO: filter
-# TODO: sorting
-# TODO: search
-
 
 @app.get("/mathematicians/{mathematician_id}")
 def read_mathematician(mathematician_id: int) -> Mathematician:
     mathematician = db.get_mathematician_by_id(mathematician_id)
     if mathematician:
         return mathematician
-    raise HTTPException(status_code=404, detail="Item not found")
+    raise HTTPException(status_code=404, detail='Item not found')
 
 
 # TODO: inserts, fix pg8000 error
@@ -43,17 +38,27 @@ def insert_mathematician(mathematician: Mathematician) -> Mathematician:
 
 
 # TODO: updates
-@app.put("/mathematicians/{id}")
-def update_mathematician(id: int, mathematician: Mathematician) -> Mathematician:
-    pass
+@app.put("/mathematicians/{mathematician_id}")
+def update_mathematician(mathematician_id: int, mathematician: Mathematician) -> Mathematician:
+    updated = db.update_mathematician(mathematician_id, mathematician)
+    if updated is None:
+        raise HTTPException(status_code=404, detail='Item not found')
+    return updated
 
 
 # TODO: deletes
-@app.delete("/mathematicians/{id}")
-def delete_mathematician(id: int, mathematician: Mathematician) -> Mathematician:
-    pass
+@app.delete("/mathematicians/{mathematician_id}")
+def delete_mathematician(mathematician_id: int) -> Mathematician:
+    deleted = db.delete_mathematician(mathematician_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail='Item not found')
+    return deleted
 
 
+# TODO: pagination
+# TODO: filter
+# TODO: sorting
+# TODO: search
 @app.get("/mathematicians")
 def query_mathematicians() -> List[Mathematician]:
     pass

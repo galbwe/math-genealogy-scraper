@@ -8,7 +8,7 @@ from pydantic.networks import url_regex
 import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy import Column, Integer, String, ForeignKey, create_engine, Date
+from sqlalchemy import or_, Column, Integer, String, ForeignKey, create_engine, Date
 
 from .models import PydanticMathematician
 
@@ -158,4 +158,53 @@ def insert_mathematician(mathematician: PydanticMathematician) -> PydanticMathem
         return sqlalchemy_mathematician.as_pydantic
     except Exception as e:
         session.rollback()
+        raise e
+
+
+def update_mathematician(id_: int, mathematician: PydanticMathematician) -> Optional[PydanticMathematician]:
+    mathematician.id = id_
+    session = Session()
+    update_data = Mathematician.from_pydantic(mathematician).as_dict
+    db_mathematician = session.query(Mathematician).filter(Mathematician.id == id_).one_or_none()
+    if not db_mathematician:
+        return None
+    try:
+        for key, value in update_data.items():
+            setattr(db_mathematician, key, value)
+        session.commit()
+        return db_mathematician.as_pydantic
+    except Exception as e:
+        session.rollback()
+        raise e
+
+
+def delete_mathematician(id_: int) -> Optional[Mathematician]:
+    session = Session()
+    db_mathematician = session.query(Mathematician).filter(Mathematician.id == id_).one_or_none()
+    if not db_mathematician:
+        return None
+    deleted = db_mathematician.as_pydantic
+    student_advisor_relationships = (
+        session.query(StudentAdvisor)
+        .filter(or_(
+            StudentAdvisor.student_id == id_,
+            StudentAdvisor.advisor_id == id_,
+        ))
+    )
+    try:
+        for rel in student_advisor_relationships:
+            session.delete(rel)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise e
+    try:
+        session.delete(db_mathematician)
+        session.commit()
+        return deleted
+    except Exception as e:
+        session.rollback()
+        for rel in student_advisor_relationships:
+            session.add(rel)
+        session.commit()
         raise e
