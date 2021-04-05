@@ -1,3 +1,23 @@
+"""
+Creates a folder with csv files containing a thesis title and subject classification.
+Each csv has 5000 rows by default.
+
+example usage:
+    from root directory
+    python ./scripts/get_thesis_subject.py
+
+    from scripts directory
+    python ./get_thesis_subject.py
+
+
+command line arguments:
+    :folder:
+        relative path to the directory where the csv will be saved
+        ex:
+            python ./scripts/get_thesis_subject.py some-other-directory-name
+"""
+
+
 import sys
 import os
 import pandas as pd
