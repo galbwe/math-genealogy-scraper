@@ -16,4 +16,3 @@ class PydanticMathematician(PydanticBase):
     math_sci_net_url: Optional[HttpUrl]
     publications: Optional[int]
     citations: Optional[int]
-

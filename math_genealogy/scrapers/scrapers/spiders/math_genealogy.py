@@ -27,7 +27,7 @@ class MathGenealogySpider(scrapy.Spider):
     name = "math_genealogy"
 
     start_urls = [
-        f'https://www.mathgenealogy.org/id.php?id={i}'
+        f"https://www.mathgenealogy.org/id.php?id={i}"
         for i in random.sample(range(1, 265263 + 1), k=16)
     ]
 
@@ -38,7 +38,7 @@ class MathGenealogySpider(scrapy.Spider):
         mathematician.math_genealogy_url = str(response.url)
 
         # get id
-        id_match = re.search(r'id=(\d+)', response.url)
+        id_match = re.search(r"id=(\d+)", response.url)
         if id_match is not None:
             mathematician.id_ = id_match.group(1)
 
@@ -53,12 +53,12 @@ class MathGenealogySpider(scrapy.Spider):
         # get year grauduated
         graduated_span = response.css('span[style="margin-right: 0.5em"]').get()
         if graduated_span:
-            graduated_match = re.search('\D(\d{4})\D', graduated_span)
+            graduated_match = re.search("\D(\d{4})\D", graduated_span)
             if graduated_match:
                 mathematician.graduated = int(graduated_match.group(1))
 
         # get thesis title
-        mathematician.thesis = response.css('#thesisTitle::text').get()
+        mathematician.thesis = response.css("#thesisTitle::text").get()
 
         # get nationality
         nationality_img = response.css('img[src*="img/flags/"]').get()
@@ -73,14 +73,14 @@ class MathGenealogySpider(scrapy.Spider):
         # get links and ids for other mathematicians on the page
         mathematician_a_selectors = response.css('a[href^="id.php?id="]')
         # remove link to students in chronological order
-        mathematician_a_selectors = [s for s in mathematician_a_selectors if "Chrono=" not in s.get()]
+        mathematician_a_selectors = [
+            s for s in mathematician_a_selectors if "Chrono=" not in s.get()
+        ]
         # student links are inside a table, but advisor links are outside the table
         student_selectors = response.css('table a[href^="id.php?id="]')
         student_text = set(map(lambda x: x.get(), student_selectors))
 
-        advisor_selectors = [
-            s for s in mathematician_a_selectors
-            if s.get() not in student_text]
+        advisor_selectors = [s for s in mathematician_a_selectors if s.get() not in student_text]
 
         for advisor_selector in advisor_selectors:
             advisor_id, advisor_url = self.parse_a_selector(advisor_selector)
@@ -93,7 +93,9 @@ class MathGenealogySpider(scrapy.Spider):
             urls.append(student_url)
 
         # get subject
-        mathematician.subject = response.css('div[style="text-align: center; margin-top: 1ex"]::text').get()
+        mathematician.subject = response.css(
+            'div[style="text-align: center; margin-top: 1ex"]::text'
+        ).get()
 
         # get link to MathSciNet if it exists
         math_sci_net_link = response.css('a[href^="http://www.ams.org/mathscinet/MRAuthorID"]')
@@ -106,39 +108,42 @@ class MathGenealogySpider(scrapy.Spider):
         # follow math sci net url and try to scrape publications and citations
         if mathematician.math_sci_net_url:
             # follow valid url, passing data collected up to this point along to the next parse method
-            request = scrapy.Request(mathematician.math_sci_net_url, callback=self.parse_math_sci_net)
-            request.meta['mathematician'] = mathematician  # passes collected data to next parse method
+            request = scrapy.Request(
+                mathematician.math_sci_net_url, callback=self.parse_math_sci_net
+            )
+            request.meta[
+                "mathematician"
+            ] = mathematician  # passes collected data to next parse method
             yield request
         else:
-            self.logger.debug('mathematician: %s', asdict(mathematician))
+            self.logger.debug("mathematician: %s", asdict(mathematician))
             yield mathematician
 
         # follow urls for advisor and students
-        self.logger.debug('following urls: %s', ', '.join(urls))
+        self.logger.debug("following urls: %s", ", ".join(urls))
         yield from response.follow_all(urls, callback=self.parse)
 
     def parse_math_sci_net(self, response):
-        mathematician = response.meta['mathematician']
-        trs = response.css('tr')
-        self.logger.debug('trs: %s', trs)
+        mathematician = response.meta["mathematician"]
+        trs = response.css("tr")
+        self.logger.debug("trs: %s", trs)
         if trs:
             publication_trs = [tr for tr in trs if "total publications" in tr.get().lower()]
-            self.logger.debug('publication_trs: %s', publication_trs)
+            self.logger.debug("publication_trs: %s", publication_trs)
             if publication_trs:
-                publications = publication_trs[0].css('td:last-of-type::text').get()
-                self.logger.debug('publications: %s', publications)
+                publications = publication_trs[0].css("td:last-of-type::text").get()
+                self.logger.debug("publications: %s", publications)
                 mathematician.publications = int(publications) if publications else publications
             citation_trs = [tr for tr in trs if "total citations" in tr.get().lower()]
-            self.logger.debug('citation_trs: %s', citation_trs)
+            self.logger.debug("citation_trs: %s", citation_trs)
             if citation_trs:
-                citations = citation_trs[0].css('td:last-of-type::text').get()
-                self.logger.debug('citations: %s', citations)
+                citations = citation_trs[0].css("td:last-of-type::text").get()
+                self.logger.debug("citations: %s", citations)
                 mathematician.citations = int(citations) if citations else citations
 
-        self.logger.debug('mathematician: %s', asdict(mathematician))
+        self.logger.debug("mathematician: %s", asdict(mathematician))
 
         yield mathematician
-
 
     def parse_a_selector(self, selector) -> Tuple[Optional[int], Optional[str]]:
         id_, url = None, None
@@ -148,7 +153,7 @@ class MathGenealogySpider(scrapy.Spider):
 
         tag = selector.get()
 
-        id_match = re.search('id=(\d+)', tag)
+        id_match = re.search("id=(\d+)", tag)
         if id_match:
             id_ = int(id_match.group(1))
 

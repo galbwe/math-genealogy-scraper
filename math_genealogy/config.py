@@ -28,8 +28,7 @@ def get_config() -> Config:
     try:
         environment = os.environ[ENVIRONMENT]
     except KeyError:
-        raise EnvironmentError(
-            environment_error % ENVIRONMENT)
+        raise EnvironmentError(environment_error % ENVIRONMENT)
     if environment.lower().startswith("dev"):
         key = POSTGRES_CONNECTION_DEV
     elif environment.lower().startswith("prod"):
