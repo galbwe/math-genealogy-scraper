@@ -63,12 +63,17 @@ def delete_mathematician(mathematician_id: int) -> Mathematician:
 def query_mathematicians() -> List[Mathematician]:
     pass
 
+
 # relationships
-@app.get("/mathematicians/{id}/students")
-def get_mathematician_students() -> List[Mathematician]:
-    pass
+@app.get("/mathematicians/{mathematician_id}/students")
+def get_mathematician_students(mathematician_id: int) -> List[Mathematician]:
+    if not db.get_mathematician_by_id(mathematician_id):
+        raise HTTPException(status_code=404, detail='Item not found')
+    return db.get_students(mathematician_id)
 
 
-@app.get("/mathematicians/{id}/advisors")
-def get_mathematician_advisors() -> List[Mathematician]:
-    pass
+@app.get("/mathematicians/{mathematician_id}/advisors")
+def get_mathematician_advisors(mathematician_id: int) -> List[Mathematician]:
+    if not db.get_mathematician_by_id(mathematician_id):
+        raise HTTPException(status_code=404, detail='Item not found')
+    return db.get_advisors(mathematician_id)

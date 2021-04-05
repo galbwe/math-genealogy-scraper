@@ -208,3 +208,23 @@ def delete_mathematician(id_: int) -> Optional[Mathematician]:
             session.add(rel)
         session.commit()
         raise e
+
+
+def get_students(id_: int) -> List[Mathematician]:
+    session = Session()
+    student_ids = session.query(StudentAdvisor.student_id).filter(StudentAdvisor.advisor_id == id_)
+    students = session.query(Mathematician).filter(Mathematician.id.in_(student_ids))
+    return [
+        student.as_pydantic
+        for student in students
+    ]
+
+
+def get_advisors(id_: int) -> List[Mathematician]:
+    session = Session()
+    advisor_ids = session.query(StudentAdvisor.advisor_id).filter(StudentAdvisor.student_id == id_)
+    advisors = session.query(Mathematician).filter(Mathematician.id.in_(advisor_ids))
+    return [
+        advisor.as_pydantic
+        for advisor in advisors
+    ]
