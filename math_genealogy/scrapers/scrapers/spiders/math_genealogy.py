@@ -53,7 +53,7 @@ class MathGenealogySpider(scrapy.Spider):
         # get year grauduated
         graduated_span = response.css('span[style="margin-right: 0.5em"]').get()
         if graduated_span:
-            graduated_match = re.search("\D(\d{4})\D", graduated_span)
+            graduated_match = re.search(r"\D(\d{4})\D", graduated_span)
             if graduated_match:
                 mathematician.graduated = int(graduated_match.group(1))
 
@@ -153,11 +153,11 @@ class MathGenealogySpider(scrapy.Spider):
 
         tag = selector.get()
 
-        id_match = re.search("id=(\d+)", tag)
+        id_match = re.search(r"id=(\d+)", tag)
         if id_match:
             id_ = int(id_match.group(1))
 
-        href_match = re.search('href="(.+)"', tag)
+        href_match = re.search(r'href="(.+)"', tag)
         if href_match:
             url = href_match.group(1)
 

@@ -1,7 +1,6 @@
 from typing import Optional
-from contextlib import contextmanager
 
-from pydantic import BaseModel as PydanticBase, HttpUrl, validator
+from pydantic import BaseModel as PydanticBase, HttpUrl
 
 
 class PydanticMathematician(PydanticBase):

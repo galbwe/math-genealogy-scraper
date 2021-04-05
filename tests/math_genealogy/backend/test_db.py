@@ -1,7 +1,3 @@
-from datetime import date
-
-import pytest
-
 from math_genealogy.backend.db import Mathematician
 from math_genealogy.backend.models import PydanticMathematician
 

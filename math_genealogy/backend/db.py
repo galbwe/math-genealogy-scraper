@@ -1,22 +1,16 @@
 import logging
 import re
-import reprlib
-from datetime import date
 from typing import List, Union, Dict, Optional
-from pydantic.networks import url_regex
 
-import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy import or_, Column, Integer, String, ForeignKey, create_engine, Date
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import or_, Column, Integer, String, ForeignKey, create_engine
 
+from ..config import CONFIG
 from .models import PydanticMathematician
 
 
 logger = logging.getLogger(__name__)
-
-
-from ..config import CONFIG
 
 
 BaseModel = declarative_base()

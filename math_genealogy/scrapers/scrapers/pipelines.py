@@ -9,7 +9,6 @@ import json
 import logging
 import datetime
 
-import pg8000
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 from sqlalchemy.orm import sessionmaker
@@ -56,7 +55,7 @@ class SqlalchemyWriterPipeline:
     def process_item(self, item, spider):
         self._update_cache()
         if not item.id_:
-            raise DropItem(f"Item had invalid key")
+            raise DropItem("Item had invalid key")
         if item.id_ in self.processed_ids:
             raise DropItem(f'Already processed item with id "{item.id_}"')
         self.processed_ids.add(item.id_)

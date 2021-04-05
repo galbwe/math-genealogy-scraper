@@ -1,5 +1,3 @@
-from datetime import date
-
 import pytest
 
 from math_genealogy.backend.models import PydanticMathematician
