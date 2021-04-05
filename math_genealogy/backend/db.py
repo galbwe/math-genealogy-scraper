@@ -2,7 +2,7 @@ import logging
 import re
 import reprlib
 from datetime import date
-from typing import Callable, List, Union, Iterable, Optional
+from typing import List, Union, Dict, Optional
 from pydantic.networks import url_regex
 
 import sqlalchemy
@@ -104,6 +104,21 @@ class Mathematician(BaseModel):
         name = self.__class__.__name__
         args = ', '.join([f"{k}={v!r}" for (k, v) in self.as_dict.items()])
         return f"{name}({args})"
+
+
+MATHEMATICIAN_FIELDS = {
+    'id': Mathematician.id,
+    'name': Mathematician.name,
+    'school': Mathematician.school,
+    'graduated': Mathematician.graduated,
+    'thesis': Mathematician.thesis,
+    'country': Mathematician.country,
+    'subject': Mathematician.subject,
+    'math_genealogy_url': Mathematician.math_genealogy_url,
+    'math_sci_net_url': Mathematician.math_sci_net_url,
+    'publications': Mathematician.publications,
+    'citations': Mathematician.citations,
+}
 
 
 def _convert_pydantic_http_url_to_string(http_url):
@@ -227,4 +242,18 @@ def get_advisors(id_: int) -> List[Mathematician]:
     return [
         advisor.as_pydantic
         for advisor in advisors
+    ]
+
+
+def get_mathematicians(page: int, perpage: int, fields: List[str]) -> List[Dict]:
+    session = Session()
+    # TODO: validate inputs
+    columns = (MATHEMATICIAN_FIELDS.get(field) for field in fields)
+    query = session.query(*[column for column in columns if column is not None])
+    start_idx = (page - 1) * perpage
+    end_idx = start_idx + perpage
+    records = query[start_idx:end_idx]
+    return [
+        dict(record)
+        for record in records
     ]

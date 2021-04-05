@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Dict
 
 from fastapi import FastAPI, HTTPException
 
@@ -55,13 +55,18 @@ def delete_mathematician(mathematician_id: int) -> Mathematician:
     return deleted
 
 
-# TODO: pagination
-# TODO: filter
+@app.get("/fields/mathematicians")
+def get_mathematician_field_names() -> List[str]:
+    return list(db.MATHEMATICIAN_FIELDS)
+
+
 # TODO: sorting
 # TODO: search
 @app.get("/mathematicians")
-def query_mathematicians() -> List[Mathematician]:
-    pass
+def query_mathematicians(page: int = 1, perpage: int = 100, fields: str = '*') -> List[Dict]:
+    if fields != '*':
+        fields = [field.strip() for field in fields.split(',')]
+    return db.get_mathematicians(page, perpage, fields)
 
 
 # relationships
