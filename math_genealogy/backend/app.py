@@ -59,7 +59,13 @@ def get_mathematician_field_names() -> List[str]:
 
 # TODO: search
 @app.get("/mathematicians")
-def query_mathematicians(page: int = 1, perpage: int = 100, fields: str = "*", order_by: str = "id", descending: str = "false") -> List[Dict]:
+def query_mathematicians(
+    page: int = 1,
+    perpage: int = 100,
+    fields: str = "*",
+    order_by: str = "id",
+    descending: str = "false",
+) -> List[Dict]:
     if fields != "*":
         fields = [field.strip() for field in fields.split(",")]
     order_by = [field.strip() for field in order_by.split(",")]

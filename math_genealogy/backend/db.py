@@ -241,23 +241,19 @@ def get_advisors(id_: int) -> List[Mathematician]:
 
 
 def get_mathematicians(
-    page: int,
-    perpage: int,
-    fields: List[str],
-    order_by: List[str],
-    descending: bool
+    page: int, perpage: int, fields: List[str], order_by: List[str], descending: bool
 ) -> List[Dict]:
     session = Session()
     # TODO: validate inputs
 
-    columns = list(MATHEMATICIAN_FIELDS.values()) if fields == '*' else (MATHEMATICIAN_FIELDS.get(field) for field in fields)
+    columns = (
+        list(MATHEMATICIAN_FIELDS.values())
+        if fields == "*"
+        else (MATHEMATICIAN_FIELDS.get(field) for field in fields)
+    )
     order_by = (MATHEMATICIAN_FIELDS.get(field) for field in order_by)
     if descending:
-        order_by = (
-            column.desc()
-            for column in order_by
-            if order_by is not None
-        )
+        order_by = (column.desc() for column in order_by if order_by is not None)
 
     query = session.query(*[column for column in columns if column is not None])
     query = query.order_by(*[column for column in order_by if column is not None])
