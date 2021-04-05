@@ -17,6 +17,9 @@ app = FastAPI()
 # TODO: blanket error handling
 
 
+# TODO: set up auth
+
+
 @app.get("/mathematicians/{mathematician_id}")
 def read_mathematician(mathematician_id: int) -> Mathematician:
     mathematician = db.get_mathematician_by_id(mathematician_id)

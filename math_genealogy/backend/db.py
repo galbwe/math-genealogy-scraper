@@ -250,7 +250,7 @@ def get_mathematicians(
     session = Session()
     # TODO: validate inputs
 
-    columns = (MATHEMATICIAN_FIELDS.get(field) for field in fields)
+    columns = list(MATHEMATICIAN_FIELDS.values()) if fields == '*' else (MATHEMATICIAN_FIELDS.get(field) for field in fields)
     order_by = (MATHEMATICIAN_FIELDS.get(field) for field in order_by)
     if descending:
         order_by = (
