@@ -129,6 +129,14 @@ class StudentAdvisor(BaseModel):
     advisor_id = Column(Integer, ForeignKey("mathematician.id"))
 
 
+class ArxivPaper(BaseModel):
+    __tablename__ = "arxiv_paper"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String)
+    subjects = Column(String)
+
+
 # ------------------------------------------------------------------------
 # ------------------------------------------------------------------------
 # DATA ACCESS
