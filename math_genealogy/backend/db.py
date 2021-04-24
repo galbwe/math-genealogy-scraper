@@ -135,6 +135,7 @@ class ArxivPaper(BaseModel):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String)
     subjects = Column(String)
+    msc_classes = Column(String)
 
 
 # ------------------------------------------------------------------------

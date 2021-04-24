@@ -64,6 +64,7 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "scrapers.pipelines.SqlalchemyWriterPipeline": 300,
+    "scrapers.pipelines.ArxivPaperWriterPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
