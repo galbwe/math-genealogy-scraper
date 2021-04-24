@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
 from math_genealogy.config import CONFIG
-from math_genealogy.backend.db import Mathematician, StudentAdvisor
+from math_genealogy.backend.db import Mathematician, StudentAdvisor, ArxivPaper
 
 
 logger = logging.getLogger(__name__)
@@ -46,6 +46,7 @@ class SqlalchemyWriterPipeline:
     cache_size = 2000
 
     def open_spider(self, spider):
+        self.skip = spider.name != "math_genealogy"
         self.processed_ids = set()
         self.items = []
 
@@ -53,6 +54,8 @@ class SqlalchemyWriterPipeline:
         self.Session = sessionmaker(bind=self.engine)
 
     def process_item(self, item, spider):
+        if self.skip:
+            return item
         self._update_cache()
         if not item.id_:
             raise DropItem("Item had invalid key")
@@ -163,3 +166,45 @@ class SqlalchemyWriterPipeline:
     def _update_cache(self):
         if len(self.processed_ids) > self.cache_size:
             self.processed_ids = set()
+
+
+class ArxivPaperWriterPipeline:
+
+    batch_size = 500
+
+    def open_spider(self, spider):
+        self.skip = spider.name != "arxiv"
+        self.items = []
+        self.engine = create_engine(CONFIG.db_connection)
+        self.Session = sessionmaker(bind=self.engine)
+
+    def process_item(self, item, spider):
+        if self.skip:
+            return item
+        self.items.append(ItemAdapter(item).asdict())
+        if len(self.items) >= self.batch_size:
+            self._insert_items()
+            self.items = []
+        return item
+
+    def _insert_items(self):
+        session = self.Session()
+        try:
+            session.bulk_save_objects([
+                ArxivPaper(
+                    title=item['title'],
+                    subjects=item['subjects'],
+                    msc_classes=item['msc_classes'],
+                )
+                for item in self.items
+            ])
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            logger.error("Exception while saving items to database: %r", e)
+            logger.error(
+                "Could not write items to database: %r",
+                ",".join(str(item["id_"]) for item in self.items),
+            )
+        finally:
+            session.close()
