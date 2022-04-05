@@ -3,7 +3,7 @@ import re
 from typing import List, Union, Dict, Optional
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import or_, Column, Integer, String, ForeignKey, create_engine
 
 from ..config import CONFIG
