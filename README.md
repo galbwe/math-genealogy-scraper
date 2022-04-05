@@ -64,3 +64,9 @@ You should not see any tables with "student" or "advisor" in the name.
     ```bash
     scrapy crawl math_genealogy
     ```
+1. Let the scraper run for a little bit.
+1. You can check on the progress by querying the number of mathematicians and student-advisor relationships in the database:
+    ```sql
+    SELECT COUNT(*) FROM mathematicians;
+    SELECT COUNT(*) FROM student_advisor;
+    ```
