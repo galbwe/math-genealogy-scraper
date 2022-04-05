@@ -114,15 +114,15 @@ class SqlalchemyWriterPipeline:
                     student_relation = (
                         session.query(StudentAdvisor)
                         .filter(
-                            (StudentAdvisor.student == student)
-                            & (StudentAdvisor.advisor == mathematician)
+                            (StudentAdvisor.student_id == student_id)
+                            & (StudentAdvisor.advisor_id == mathematician.id)
                         )
                         .first()
                     )
                     if not student_relation:
                         student_relation = StudentAdvisor()
-                        student_relation.student = student
-                        student_relation.advisor = mathematician
+                        student_relation.student_id = student.id
+                        student_relation.advisor_id = mathematician.id
 
                     session.add(student_relation)
 
@@ -140,15 +140,15 @@ class SqlalchemyWriterPipeline:
                     advisor_relation = (
                         session.query(StudentAdvisor)
                         .filter(
-                            (StudentAdvisor.student == mathematician)
-                            & (StudentAdvisor.advisor == advisor)
+                            (StudentAdvisor.student_id == mathematician.id)
+                            & (StudentAdvisor.advisor_id == advisor_id)
                         )
                         .first()
                     )
                     if not advisor_relation:
                         advisor_relation = StudentAdvisor()
-                        advisor_relation.student = mathematician
-                        advisor_relation.advisor = advisor
+                        advisor_relation.student_id = mathematician.id
+                        advisor_relation.advisor_id = advisor_id
 
                     session.add(advisor_relation)
 
